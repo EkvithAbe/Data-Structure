@@ -1,80 +1,104 @@
-package DataStructure;
+import java.util.NoSuchElementException;
 
-import java.util.ArrayDeque;
+public class ArrayDequeN<E> {
+    private E[] elements;
+    private int head;
+    private int tail;
+    private int size;
 
-import java.util.Deque;
-import java.util.Scanner;
+    private static final int DEFAULT_CAPACITY = 16;
 
-public class ArrayDequeN {
+    @SuppressWarnings("unchecked")
+    public ArrayDequeN() {
+        elements = (E[]) new Object[DEFAULT_CAPACITY];
+        head = 0;
+        tail = 0;
+        size = 0;
+    }
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+    public void addFirst(E e) {
+        if (size == elements.length) {
+            resize();
+        }
+        head = (head - 1 + elements.length) % elements.length;
+        elements[head] = e;
+        size++;
+    }
 
+    public void addLast(E e) {
+        if (size == elements.length) {
+            resize();
+        }
+        elements[tail] = e;
+        tail = (tail + 1) % elements.length;
+        size++;
+    }
 
+    public E removeFirst() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        E value = elements[head];
+        elements[head] = null;  // Help GC
+        head = (head + 1) % elements.length;
+        size--;
+        return value;
+    }
 
-		        Deque<Object> stack = new ArrayDeque<>();
-		        Scanner scanner = new Scanner(System.in);
+    public E removeLast() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        tail = (tail - 1 + elements.length) % elements.length;
+        E value = elements[tail];
+        elements[tail] = null;  // Help GC
+        size--;
+        return value;
+    }
 
-		        while (true) {
-		            System.out.println("Choose an operation:");
-		            System.out.println("1: Push an element");
-		            System.out.println("2: Pop an element");
-		            System.out.println("3: Peek at the top element");
-		            System.out.println("4: Check if the stack is empty");
-		            System.out.println("5: Exit");
+    public E peekFirst() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return elements[head];
+    }
 
-		            int choice = scanner.nextInt();
-		            scanner.nextLine(); // consume the newline character
-		            switch (choice) {
-		                case 1:
-		                    System.out.print("Enter  element to push onto the stack: ");
-		                    String input = scanner.nextLine();
-		                    Object element = parseInput(input);
-		                    stack.push(element);
-		                    System.out.println("Pushed " + element + " onto the stack.");
-		                    break;
-		                case 2:
-		                    if (stack.isEmpty()) {
-		                        System.out.println(" stack is empty. Nothing to pop.");
-		                    } else {
-		                        Object poppedValue = stack.pop();
-		                        System.out.println("Popped: " + poppedValue);
-		                    }
-		                    break;
-		                case 3:
-		                    if (stack.isEmpty()) {
-		                        System.out.println(" stack is empty.Nothing to peek.");
-		                    } else {
-		                        Object topValue = stack.peek();
-		                        System.out.println("Peek: " + topValue);
-		                    }
-		                    break;
-		                case 4:
-		                    if (stack.isEmpty()) {
-		                        System.out.println(" stack is empty.");
-		                    } else {
-		                        System.out.println("stack is not empty.");
-		                    }
-		                    break;
-		                case 5:
-		                    System.out.println("Exiting");
-		                    scanner.close();
-		                    return;
-		                default:
-		                    System.out.println(" Please try again.");
-		            }
-		        }
-		    }
+    public E peekLast() {
+        if (isEmpty()) {
+            throw new NoSuchElementException();
+        }
+        return elements[(tail - 1 + elements.length) % elements.length];
+    }
 
-		    private static Object parseInput(String input) {
-		        try {
-		            return Integer.parseInt(input);
-		        } catch (NumberFormatException e1) {
-		            try {
-		                return Double.parseDouble(input);
-		            } catch (NumberFormatException e2) {
-		                return input; // return the input string if it's neither an integer nor a double
-		            }
-		        }
-		    }
+    public int size() {
+        return size;
+    }
+
+    public boolean isEmpty() {
+        return size == 0;
+    }
+
+    @SuppressWarnings("unchecked")
+    private void resize() {
+        int newCapacity = elements.length * 2;
+        E[] newElements = (E[]) new Object[newCapacity];
+        for (int i = 0; i < size; i++) {
+            newElements[i] = elements[(head + i) % elements.length];
+        }
+        elements = newElements;
+        head = 0;
+        tail = size;
+    }
+
+    public static void main(String[] args) {
+        ArrayDequeN<Integer> deque = new ArrayDequeN<>();
+        
+        deque.addFirst(1);
+        deque.addLast(2);
+        deque.addFirst(0);
+        
+        System.out.println(deque.removeLast());   // Output: 2
+        System.out.println(deque.removeFirst());  // Output: 0
+        System.out.println(deque.peekFirst());    // Output: 1
+    }
 }
